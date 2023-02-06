@@ -1,24 +1,39 @@
-from flask import Flask, flash, redirect, render_template, request, session, abort
-application  = app = Flask(__name__)
+from flask import Flask
+from flask_cors import CORS
+from flask_jwt_extended import JWTManager
+from flask_restful import Api
 
-@app.route("/")
-def index():
-    return "Index!"
+from modelos import db
+from vistas import \
+    VistaSignIn, VistaLogIn, \
+    VistaPersona, VistaPersonas, \
+	VistaEjercicio, VistaEjercicios, \
+	VistaEntrenamiento, VistaEntrenamientos, \
+    VistaReporte
 
-@app.route("/members")
-def members():
-    return "Members"
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dbapp.sqlite'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['JWT_SECRET_KEY'] = 'frase-secreta'
+app.config['PROPAGATE_EXCEPTIONS'] = True
 
-@app.route("/members/<string:name>/")
-def getMember(name):
-    return name
+app_context = app.app_context()
+app_context.push()
 
-@app.route("/hello/<string:name>/")
-def hello(name):
-    return render_template(
-        'test.html',name=name)
+db.init_app(app)
+db.create_all()
 
+cors = CORS(app)
 
-if __name__ == "__main__":
-    app.run("0.0.0.0",debug=False)
-    #app.run("0.0.0.0",debug=True)
+api = Api(app)
+api.add_resource(VistaSignIn, '/signin')
+api.add_resource(VistaLogIn, '/login')
+api.add_resource(VistaPersonas, '/personas/<int:id_usuario>')
+api.add_resource(VistaPersona, '/persona/<int:id_persona>')
+api.add_resource(VistaEjercicios, '/ejercicios')
+api.add_resource(VistaEjercicio, '/ejercicio/<int:id_ejercicio>')
+api.add_resource(VistaEntrenamientos, '/entrenamientos/<int:id_persona>')
+api.add_resource(VistaEntrenamiento, '/entrenamiento/<int:id_entrenamiento>')
+api.add_resource(VistaReporte, '/persona/<int:id_persona>/reporte')
+
+jwt = JWTManager(app)
