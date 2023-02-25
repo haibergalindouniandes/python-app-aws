@@ -1,13 +1,12 @@
-# This workflow will install Python dependencies, run tests with a single version of Python
-
-name: Python application
+name: Flujo de integracion Continua con Python PDA Grupo 1
 
 on:
   push:
     branches: [ "feature_**" ]
 
 jobs:
-  job_pruebas_automaticas:
+  job_pruebas_automaticas:    
+    name: Ejecución Pruebas Automatizadas
     runs-on: windows-latest
     outputs:
       mensaje-commit: ${{ steps.obtener-mensaje-commit.outputs.commit-msg }}
@@ -28,7 +27,7 @@ jobs:
           python-version: '3.10'
     - name: Instalacion de librerias y dependencias
       run: |
-        python -m pip install --upgrade pip
+        py -m pip install --upgrade pip
         pip install flake8 pytest
         pip install -r requirements.txt
     - name: Correr pruebas automatizadas
@@ -44,3 +43,4 @@ jobs:
       env:
         MENSAJE_EXITO: Todas las pruebas fueron exitosas
       run: 'echo "::set-output name=respuesta::${MENSAJE_EXITO}"'
+      
